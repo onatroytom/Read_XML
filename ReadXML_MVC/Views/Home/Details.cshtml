@@ -1,0 +1,58 @@
+﻿@model string
+@{
+    ViewData["Title"] = "Details";
+}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center w-100">
+        <div>
+            <h6 id="details-artist" class="text-muted mb-0"></h6>
+        </div>
+        <div>
+            <h6 id="details-category" class="text-muted mb-0"></h6>
+        </div>
+    </div>
+    <h1 id="details-title">Loading...</h1>
+
+    <hr />
+
+    <table class="table table-striped mt-4">
+        <thead>
+            <tr>
+                <th style="width: 50px">#</th>
+                <th>Track Name</th>
+            </tr>
+        </thead>
+        <tbody id="details-track-body">
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded",() =>
+    {
+        const tbody = document.getElementById("details-track-body");
+        const titleQuery = encodeURIComponent("@Model");
+
+        fetch(`/api/details/${titleQuery}`)
+        .then(res=>res.json())
+        .then(data=> {
+            document.getElementById("details-artist").innerHTML = "Artist: " + data.artist;
+            document.getElementById("details-category").innerHTML = "Category: " + data.category;
+            document.getElementById("details-title").innerHTML = "Album: " + data.title;
+
+            tbody.innerHTML = "";
+
+            data.trackList.forEach(item => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${item.trackOrder}</td>
+                            <td>${item.trackName}</td>
+                        </tr>`;
+            })
+        .catch(err => {
+            console.error("Fetch error:", err);
+            document.getElementById("details-title").innerHTML = "Error loading data.";
+        });
+        });
+    });
+</script>

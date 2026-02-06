@@ -1,0 +1,44 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+<div class="container-mt-4">
+    <div class="container mt-4">
+        <div id="album-grid" class="row">
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded",() =>
+    {
+       const grid = document.getElementById("album-grid");
+
+        fetch("/api/home-info")
+        .then(res=>res.json())
+        .then(data=> {
+                    grid.innerHTML="";
+                    data.forEach(item=> {
+                            grid.innerHTML +=`
+                            <div class="col-md-3 mb-3">
+                                <div class="card h-100 shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${item.title}</h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">${item.artist}</h6>
+                                        <p class="card-text">
+                                            <span class="badge bg-info text-dark">${item.category}</span>
+                                        </p>
+                                    </div>
+                                    <div class="card-footer bg-transparent border-top-0">
+                                        <a href="/Home/Details?title=${item.title}"
+                                           class="btn btn-success w-100">
+                                           View Details
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>`;
+                        });
+            })
+        .catch(err => console.error("Error fetching data:", err));
+    });
+</script>

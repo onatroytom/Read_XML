@@ -1,0 +1,74 @@
+﻿@{
+    ViewData["Title"] = "Search";
+}
+
+<div>
+    <input id="query" type="text" style="width: 70%"placeholder="Criteria" />
+    <button type="button" class="btn btn-success" onclick="runSearch()">Search</button>
+    <br />
+    <h6 id="result-search" class="text-muted"></h6>
+    <br />
+</div>
+
+<table class="table table-striped mt-4">
+    <thead>
+        <tr>
+            <th style="width: 50px">Title</th>
+            <th style="width: 50px">Artist</th>
+            <th style="width: 50px">Category</th>
+            <th style="width: 50px">Track</th>
+            <th style="width: 50px">View Details</th>
+        </tr>
+    </thead>
+    <tbody id="response-result-body">
+    </tbody>
+</table>
+
+
+<script>
+        function runSearch() {
+        var searchText = document.getElementById("query").value;
+        const tbody = document.getElementById("response-result-body");
+        var resultLabel = document.getElementById("result-search");
+
+        tbody.innerHTML = "";
+
+        fetch(`/api/search-item?query=${searchText}`)
+            .then(res => res.json())
+            .then(data => {
+                resultLabel.innerHTML = `Result for ${searchText}....`;
+
+                data.forEach(item => {
+                    if (item.trackList && item.trackList.length > 0) {
+                        item.trackList.forEach(track => {
+                            tbody.innerHTML += `
+                            <tr>
+                                <td>${item.title}</td>
+                                <td>${item.artist}</td>
+                                <td>${item.category}</td>
+                                <td><strong>${track.trackOrder}.</strong> ${track.trackName}</td>
+                                <td>
+                                    <a href="Details?title=${encodeURIComponent(item.title)}" class="btn btn-success">View Details</a>
+                                </td>
+                            </tr>
+                            `;
+                        });
+                    } else {
+                        tbody.innerHTML += `
+                        <tr>
+                            <td>${item.title}</td>
+                            <td>${item.artist}</td>
+                            <td>${item.category}</td>
+                            <td class="text-muted">No tracks available</td>
+                            <td>
+                                <a href="Details?title=${encodeURIComponent(item.title)}" class="btn btn-success">View Details</a>
+                            </td>
+                        </tr>`;
+                    }
+                });
+            }).catch(err => {
+                console.error("Error:", err);
+                resultLabel.innerHTML = "Error fetching search results.";
+            });
+    }
+</script>
